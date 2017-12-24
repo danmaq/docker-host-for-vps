@@ -1,7 +1,23 @@
 {
     "name": "docker-host-for-vps",
+    "description": ":)",
     "version": "0.1.0",
-    "repository": "git@github.com:danmaq/dockerHost4VPS.git",
     "author": "Shuhei Nomura <info@danmaq.com>",
-    "license": "MIT"
+    "license": "MIT",
+    "homepage": "https://github.com/danmaq/docker-host-for-vps",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/danmaq/docker-host-for-vps.git"
+    },
+    "bugs": {
+        "url": "https://github.com/danmaq/docker-host-for-vps/issues"
+    },
+    "preferGlobal": true,
+    "bin": {
+        "docker-host-for-vps": "docker-host-for-vps.js"
+    },
+    "scripts": {
+        "start": "node script/docker-host-for-vps",
+        "test": "node script/test"
+    }
 }
