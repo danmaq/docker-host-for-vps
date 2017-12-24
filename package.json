@@ -19,5 +19,8 @@
     "scripts": {
         "start": "node script/docker-host-for-vps",
         "test": "node script/test"
+    },
+    "dependencies": {
+        "dockerode": "^2.5.3"
     }
 }
