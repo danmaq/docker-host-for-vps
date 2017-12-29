@@ -23,8 +23,8 @@ const Dockerfile =
 FROM ${image}
 LABEL authors="Shuhei Nomura <info@danmaq.com>"
 
-ADD caravan.tar.gz /root/
 ADD script.tar.gz /root/
+ADD caravan.tar.gz /root/
 ADD kujirax.json /root/
 ADD hosts /root/
 RUN cd /root && chmod 755 start.sh
@@ -54,7 +54,7 @@ ansible_ssh_pass=${pass}
 ansible_become_pass=${pass}
 ${keySetting}
 `
-    )(key ? `ansible_private_key_file=/root/caravan/${key}` : '').trim();
+    )(key ? `ansible_private_key_file=/root/${key}` : '').trim();
 
 /** Root directory of temporary container for setup. */
 const setupHome = path.join(appRoot.path, '.setup');
