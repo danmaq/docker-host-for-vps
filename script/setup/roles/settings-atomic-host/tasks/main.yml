@@ -1,0 +1,6 @@
+---
+- name: Run deferred setup to gather facts
+  setup: 
+
+- import_tasks: install.yml
+- import_tasks: settings.yml

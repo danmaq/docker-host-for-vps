@@ -1,0 +1,18 @@
+---
+- name: Upgrade base-system
+  shell: atomic host upgrade
+  become: yes
+  register: rpm_upgrade
+  changed_when: '"No upgrade available." not in rpm_upgrade.stdout'
+
+- debug:
+    msg: Reserved reboot.
+  changed_when: '"systemctl reboot" in rpm_upgrade.stdout'
+  notify: Reboot OS
+
+- name: Download docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.18.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755
+  become: yes

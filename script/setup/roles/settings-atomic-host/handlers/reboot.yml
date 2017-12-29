@@ -1,0 +1,17 @@
+---
+- name: Reboot
+  shell: systemd-run --on-active=5 systemctl reboot
+  become: yes
+  async: 0
+  poll: 0
+  when: '"systemctl reboot" in rpm_upgrade.stdout'
+
+- name: Wait for server to restart
+  local_action:
+    module: wait_for
+    host: "{{ inventory_hostname }}"
+    port: "{{ ansible_port }}"
+    state: started
+    delay: 30
+    timeout: 300
+  when: '"systemctl reboot" in rpm_upgrade.stdout'
