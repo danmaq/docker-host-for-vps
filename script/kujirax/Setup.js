@@ -111,6 +111,16 @@ const createAnsibleHostsFileAsync =
     };
 
 /**
+ * Create docker instance.
+ * @return {Docker} Docker instance.
+ */
+const createDocker =
+    () =>
+    (params => new Docker(params))(
+        /^win/.test(process.platform) ?
+        ({ socketPath: '//./pipe/docker_engine' }) : undefined);
+
+/**
  * Create a Docker image for the temporary container for deployment.
  * @param {string} src Docker image.
  * @param {string} dst Docker image.
@@ -130,15 +140,6 @@ const createImageAsync =
         // FIXME: not wait?
         await docker.buildImage(ctx, { t: dst });
     };
-
-/**
- * Create docker instance.
- * @return {Docker} Docker instance.
- */
-const createDocker =
-    () =>
-    (params => new Docker(params))
-    (/^win/.test(process.platform) ? { socketPath: '//./pipe/docker_engine' } : {});
 
 /**
  * Run a Docker image for the temporary container for deployment.
