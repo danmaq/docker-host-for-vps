@@ -75,5 +75,13 @@
     ansible_port: "{{ configured_port }}"
   when: ansible_port != configured_port
 
+- name: Change the permission of the private key file.
+  local_action:
+    module: file
+    path: "{{ ansible_private_key_file }}"
+    mode: 0600
+  when: ansible_private_key_file is defined
+  changed_when: no
+
 - name: Run deferred setup to gather facts
   setup: 
