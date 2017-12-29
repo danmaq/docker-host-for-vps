@@ -1,0 +1,14 @@
+---
+- name: Create kujirax directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  become: yes
+  with_items:
+  - /opt/kujirax/production
+  - /opt/kujirax/deploy
+  
+- name: Deploy docker-compose.yml file
+  template:
+    src: docker-compose.yml
+    dest: /opt/kujirax/deploy/docker-compose.yml

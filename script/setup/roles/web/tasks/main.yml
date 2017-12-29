@@ -1,0 +1,16 @@
+---
+- name: Run deferred setup to gather facts
+  setup: 
+
+- import_tasks: deploy.yml
+
+- name: Searching for a user-defined setup definition file.
+  local_action:
+    module: stat
+    path: /root/roles/web/tasks/_main.yml
+  register: optfile
+  become: no
+
+- name: Invoke for a user-defined setup definition file.
+  include_tasks: /root/roles/web/tasks/_main.yml
+  when: optfile.stat.exists

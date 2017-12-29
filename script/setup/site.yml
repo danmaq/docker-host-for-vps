@@ -5,4 +5,4 @@
   roles:
   - ssh
   - settings-atomic-host
-  
+  - web
