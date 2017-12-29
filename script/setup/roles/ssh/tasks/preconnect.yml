@@ -1,0 +1,87 @@
+---
+
+- name: Set configured port fact.
+  set_fact:
+    configured_port: "{{ ansible_port }}"
+
+- name: Check if we're using the default SSH port.
+  local_action:
+    module: wait_for
+    port: 22
+    state: started
+    host: "{{ inventory_hostname }}"
+    connect_timeout: 5
+    timeout: 8
+  ignore_errors: yes
+  register: default_ssh
+
+- name: Set inventory ansible_port to default.
+  set_fact:
+    ansible_port: 22
+  when: default_ssh|success and
+        default_ssh.state == "started"
+  register: ssh_port_set
+
+- name: Check if we're using the inventory-provided SSH port.
+  local_action:
+    module: wait_for
+    port: "{{ ansible_port }}"
+    state: started
+    host: "{{ inventory_hostname }}"
+    connect_timeout: 5
+    timeout: 10
+  ignore_errors: yes
+  when: default_ssh.state is undefined
+  register: configured_ssh
+
+- name: SSH port is configured properly.
+  debug:
+    msg: "SSH port is configured properly."
+  when: configured_ssh is defined and
+        configured_ssh.state is defined and
+        configured_ssh.state == "started"
+  register: ssh_port_set
+
+- name: Fail if SSH port was not auto-detected. (unknown)
+  fail:
+    msg: "The SSH port is neighter 22 or {{ configured_port }}."
+  when: ssh_port_set is undefined
+
+- name: Setup alternative SSH port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^#?Port "
+    line: "Port {{ configured_port }}"
+  when: ansible_port != configured_port
+  changed_when: ansible_port != configured_port
+  become: yes
+  notify: Restart sshd
+
+- name: Setup selinux for alternative SSH port
+  seport:
+    ports: "{{ configured_port }}"
+    proto: tcp
+    setype: ssh_port_t
+    state: present
+  when: ansible_port != configured_port
+  become: yes
+
+- name: Ensure SSH is reloaded if need be
+  when: ansible_port != configured_port
+  meta: flush_handlers
+
+- name: Ensure we use the configured SSH port for the remainder of the role
+  set_fact:
+    ansible_port: "{{ configured_port }}"
+  when: ansible_port != configured_port
+
+- name: Change the permission of the private key file.
+  local_action:
+    module: file
+    path: "{{ ansible_private_key_file }}"
+    mode: 0600
+  when: ansible_private_key_file is defined
+  changed_when: no
+
+- name: Run deferred setup to gather facts
+  setup: 

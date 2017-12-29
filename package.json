@@ -1,23 +1,52 @@
 {
-    "name": "docker-host-for-vps",
+    "name": "kujirax",
     "description": ":)",
     "version": "0.1.0",
-    "author": "Shuhei Nomura <info@danmaq.com>",
     "license": "MIT",
-    "homepage": "https://github.com/danmaq/docker-host-for-vps",
+    "author": {
+        "name": "Shuhei Nomura (danmaq)",
+        "email": "info@danmaq.com",
+        "url": "https://danmaq.com"
+    },
+    "homepage": "https://github.com/danmaq/kujirax",
     "repository": {
         "type": "git",
-        "url": "https://github.com/danmaq/docker-host-for-vps.git"
+        "url": "https://github.com/danmaq/kujirax.git"
     },
     "bugs": {
-        "url": "https://github.com/danmaq/docker-host-for-vps/issues"
+        "url": "https://github.com/danmaq/kujirax/issues"
     },
     "preferGlobal": true,
     "bin": {
-        "docker-host-for-vps": "docker-host-for-vps.js"
+        "kujirax": "dist/kujirax.js"
     },
     "scripts": {
-        "start": "node script/docker-host-for-vps",
-        "test": "node script/test"
+        "start": "gulp",
+        "kujirax": "node dist/index.js"
+    },
+    "engines": {
+        "node": ">=6.12.2"
+    },
+    "dependencies": {
+        "app-root-path": "^2.0.1",
+        "babel-runtime": "^6.26.0",
+        "commander": "^2.12.2",
+        "dockerode": "^2.5.3",
+        "lodash.merge": "^4.6.0",
+        "tar": "^4.2.0"
+    },
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "babel-preset-env": "^1.6.1",
+        "babel-preset-stage-1": "^6.24.1",
+        "babel-preset-stage-2": "^6.24.1",
+        "babel-preset-stage-3": "^6.24.1",
+        "gulp": "^3.9.1",
+        "gulp-babel": "^7.0.0",
+        "gulp-plumber": "^1.1.0"
+    },
+    "kujirax": {
+        "defaultCaravan": "kujirax.json"
     }
 }

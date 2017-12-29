@@ -1,0 +1,9 @@
+---
+- name: Reboot OS
+  import_tasks: reboot.yml
+
+- name: Restart journald
+  service:
+    name: systemd-journald
+    state: restarted
+  become: yes

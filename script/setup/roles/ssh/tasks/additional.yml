@@ -1,0 +1,30 @@
+---
+- name: SSH additional settings.
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  become: yes
+  notify: Restart sshd
+  with_items:
+  - regexp: '^#?AddressFamily\s'
+    line: AddressFamily inet
+  - regexp: '^#?Protocol\s'
+    line: Protocol 2
+  - regexp: '^#?LoginGraceTime\s'
+    line: LoginGraceTime 30
+  - regexp: '^#?PermitRootLogin\s'
+    line: PermitRootLogin no
+  - regexp: '^#?MaxAuthTries\s'
+    line: MaxAuthTries 3
+  - regexp: '^#?UseDNS\s'
+    line: UseDNS no
+
+- name: Add secure path
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^Defaults\s+secure_path\s=\s'
+    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/root/bin:/root/.local/bin'
+    backrefs: yes
+    validate: visudo -cf %s
+  become: yes
