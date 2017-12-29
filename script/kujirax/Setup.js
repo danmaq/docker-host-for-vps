@@ -117,7 +117,7 @@ const createAnsibleHostsFileAsync =
  */
 const createImageAsync =
     async(src, dst) => {
-        const docker = new Docker();
+        const docker = createDocker();
         // FIXME: not wait?
         await docker.pull(src);
         try {
@@ -132,6 +132,15 @@ const createImageAsync =
     };
 
 /**
+ * Create docker instance.
+ * @return {Docker} Docker instance.
+ */
+const createDocker =
+    () =>
+    (params => new Docker(params))
+    (/^win/.test(process.platform) ? { socketPath: '//./pipe/docker_engine' } : {});
+
+/**
  * Run a Docker image for the temporary container for deployment.
  * @param {string} image Docker image.
  * @param {string} name
@@ -139,9 +148,8 @@ const createImageAsync =
  */
 const runImageAsync =
     async(image, name, shell) => {
-        const docker = new Docker();
         const container =
-            await docker.run(
+            await createDocker().run(
                 image,
                 shell,
                 process.stdout, { name }, {});
