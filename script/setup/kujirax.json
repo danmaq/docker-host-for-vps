@@ -1,7 +1,5 @@
 {
     "host": "example.com",
-    "user": "kujirax",
-    "pass": "lolitomo",
     "setup": {
         "image": "williamyeh/ansible:alpine3",
         "tempImage": "danmaq/kujirax:latest",
@@ -9,7 +7,9 @@
         "shell": ["sh", "-c", "/root/start.sh"]
     },
     "ssh": {
-        "default": 22,
-        "alt": 10005
+        "key": "",
+        "pass": "lolitomo",
+        "port": 10005,
+        "user": "kujirax"
     }
 }

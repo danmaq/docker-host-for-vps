@@ -1,0 +1,8 @@
+---
+- name: Deploy to host by kujirax.
+  hosts: kujirax
+  gather_facts: false
+  roles:
+  - ssh
+  - settings-atomic-host
+  

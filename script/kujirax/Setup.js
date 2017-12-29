@@ -23,13 +23,38 @@ const Dockerfile =
 FROM ${image}
 LABEL authors="Shuhei Nomura <info@danmaq.com>"
 
-ADD caravan.tar.gz /root/caravan
+ADD caravan.tar.gz /root/
 ADD script.tar.gz /root/
 ADD kujirax.json /root/
+ADD hosts /root/
 RUN cd /root && chmod 755 start.sh
 CMD ["/root/start.sh"]
 `
     .trim();
+
+/**
+ * Create body of hosts for Ansible.
+ * @param {string} host
+ * @param {string} port
+ * @param {string} user
+ * @param {string} key
+ * @returns {string} body of hosts for Ansible.
+ */
+const AnsibleHosts =
+    (host, port, user, pass, key) =>
+    (keySetting =>
+        `
+[kujirax]
+${host}
+
+[all:vars]
+ansible_port=${port}
+ansible_user=${user}
+ansible_ssh_pass=${pass}
+ansible_become_pass=${pass}
+${keySetting}
+`
+    )(key ? `ansible_private_key_file=/root/caravan/${key}` : '').trim();
 
 /** Root directory of temporary container for setup. */
 const setupHome = path.join(appRoot.path, '.setup');
@@ -71,7 +96,19 @@ const createDockerfileAsync =
     async(image) => {
         const text = Dockerfile(image);
         fs.writeFileSync(path.join(setupHome, 'Dockerfile'), text);
-    }
+    };
+
+/**
+ *
+ * @param {string} host
+ * @param {Caravan.SSH} ssh
+ */
+const createAnsibleHostsFileAsync =
+    async(host, ssh) => {
+        const { user, port, pass, key } = ssh;
+        const text = AnsibleHosts(host, port, user, pass, key);
+        fs.writeFileSync(path.join(setupHome, 'hosts'), text);
+    };
 
 /**
  * Create a Docker image for the temporary container for deployment.
@@ -116,10 +153,12 @@ const runImageAsync =
  */
 const setupAsync =
     async(caravan) => {
-        const { setup: { image, tempImage, name, shell } } = caravan;
+        const { host, ssh, setup: { image, tempImage, name, shell } } =
+        caravan;
         console.info('Correct items...');
         await preDeployAsync(caravan);
         await createDockerfileAsync(image);
+        await createAnsibleHostsFileAsync(host, ssh);
         console.info('Create temporary image...');
         await createImageAsync(image, tempImage);
         // XXX: Wait until the Docker image becomes available here.
