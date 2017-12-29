@@ -1,3 +1,6 @@
+.editorconfig
 .jsbeautifyrc
 .vscode
-test
+gulpfile.js
+jsconfig.json
+script/kujirax
