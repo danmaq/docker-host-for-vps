@@ -8,3 +8,11 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+.setup/*
+!.setup/start.sh
+!.empty
+node_modules
+dist
+example
+

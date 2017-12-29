@@ -1,0 +1,8 @@
+---
+- name: Change journal size
+  lineinfile:
+    dest: /etc/systemd/journald.conf
+    regexp: '^SystemMaxUse='
+    line: 'SystemMaxUse=128M'
+  become: yes
+  notify: Restart journald

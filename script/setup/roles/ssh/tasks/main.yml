@@ -1,0 +1,14 @@
+---
+- import_tasks: preconnect.yml
+- import_tasks: additional.yml
+
+- name: Searching for a user-defined setup definition file.
+  local_action:
+    module: stat
+    path: /root/roles/ssh/tasks/_main.yml
+  register: optfile
+  become: no
+
+- name: Invoke for a user-defined setup definition file.
+  include_tasks: /root/roles/ssh/tasks/_main.yml
+  when: optfile.stat.exists
