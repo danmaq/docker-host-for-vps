@@ -5,11 +5,25 @@
     state: directory
   become: yes
   with_items:
-  - /opt/kujirax/production
-  - /opt/kujirax/deploy
-  
-- name: Deploy docker-compose.yml file
+  - /opt/kujirax/proxy/conf
+
+- name: Deploy config file for NGINX.
   template:
-    src: docker-compose.yml
-    dest: /opt/kujirax/deploy/docker-compose.yml
+    src: default.conf
+    dest: /opt/kujirax/proxy/conf/default.conf
   become: yes
+  notify: Restart NGINX
+
+- name: Searching for a user-defined HTML files.
+  local_action:
+    module: stat
+    path: ~/html
+  register: user_html
+
+- name: Deploy user-defined HTML files.
+  copy:
+    src: ~/html
+    dest: /opt/kujirax/proxy/
+  become: yes
+  when: user_html.stat.isdir
+  notify: Restart NGINX

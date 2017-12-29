@@ -1,0 +1,25 @@
+---
+- name: Halt to old container
+  docker_container:
+    name: nginx
+    state: absent
+  become: yes
+  ignore_errors: yes
+
+- name: Reboot docker
+  service:
+    name: docker
+    state: restarted
+  become: yes
+
+- name: Start NGINX container.
+  docker_container:
+    name: nginx
+    image: 'nginx:alpine'
+    published_ports:
+    - '80:80'
+    - '443:443'
+    volumes:
+    - '/opt/kujirax/proxy/conf:/etc/nginx/conf.d:ro'
+    - '/opt/kujirax/proxy/html:/usr/share/nginx/html:ro'
+  become: yes
