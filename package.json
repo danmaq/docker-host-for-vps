@@ -22,7 +22,8 @@
     },
     "scripts": {
         "start": "gulp",
-        "kujirax": "node dist/index.js"
+        "kujirax": "node dist/index.js",
+        "prepublish": "gulp babel"
     },
     "engines": {
         "node": ">=6.12.2"
