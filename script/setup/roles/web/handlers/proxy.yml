@@ -22,4 +22,5 @@
     volumes:
     - '/opt/kujirax/proxy/conf:/etc/nginx/conf.d:ro'
     - '/opt/kujirax/proxy/html:/usr/share/nginx/html:ro'
+    - '/opt/kujirax/proxy/tls:/etc/nginx/tls:ro'
   become: yes
