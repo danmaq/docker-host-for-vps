@@ -3,8 +3,7 @@
     "setup": {
         "image": "williamyeh/ansible:alpine3",
         "tempImage": "danmaq/kujirax:latest",
-        "name": "kujirax-setup",
-        "shell": ["sh", "-c", "/root/start.sh"]
+        "name": "kujirax-setup"
     },
     "ssh": {
         "key": "",
