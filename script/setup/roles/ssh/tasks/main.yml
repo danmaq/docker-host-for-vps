@@ -7,7 +7,6 @@
     module: stat
     path: /root/roles/ssh/tasks/_main.yml
   register: optfile
-  become: no
 
 - name: Invoke for a user-defined setup definition file.
   include_tasks: /root/roles/ssh/tasks/_main.yml

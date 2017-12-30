@@ -10,7 +10,6 @@
     module: stat
     path: /root/roles/settings-atomic-host/tasks/_main.yml
   register: optfile
-  become: no
 
 - name: Invoke for a user-defined setup definition file.
   include_tasks: /root/roles/settings-atomic-host/tasks/_main.yml
