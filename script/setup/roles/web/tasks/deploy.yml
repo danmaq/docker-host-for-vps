@@ -1,23 +1,32 @@
 ---
-- name: Create kujirax directory
+- name: Create source directory if not exists.
+  local_action:
+    module: file
+    path: /root/certs
+    state: directory
+  changed_when: no
+
+- name: Create temporary directory for deploy.
   file:
-    path: "{{ item }}"
+    path: /opt/.kujirax
     state: directory
   become: yes
-  with_items:
-  - /opt/kujirax/proxy/conf/apps
-  - /opt/kujirax/proxy/tls
 
-- name: Deploy config file for NGINX.
-  template:
-    src: default.conf
-    dest: /opt/kujirax/proxy/conf/default.conf
-  become: yes
-  notify: Restart NGINX
-
-- name: Deploy HTML files of index.
+- name: Deploy files.
   copy:
-    src: ~/html
-    dest: /opt/kujirax/proxy/
+    src: "/root/{{ item }}"
+    dest: /opt/.kujirax/
   become: yes
-  notify: Restart NGINX
+  notify: Migrate proxy
+  with_items:
+  - certs
+  - html
+
+- name: Deploy Docker Compose settings for proxy.
+  template:
+    src: docker-compose.yml
+    dest: /opt/.kujirax/docker-compose.yml
+  become: yes
+  notify: Migrate proxy
+  with_items:
+  - inventory_hostname: "{{ inventory_hostname }}"
