@@ -5,7 +5,8 @@
     state: directory
   become: yes
   with_items:
-  - /opt/kujirax/proxy/conf
+  - /opt/kujirax/proxy/conf/apps
+  - /opt/kujirax/proxy/tls
 
 - name: Deploy config file for NGINX.
   template:
@@ -14,16 +15,9 @@
   become: yes
   notify: Restart NGINX
 
-- name: Searching for a user-defined HTML files.
-  local_action:
-    module: stat
-    path: ~/html
-  register: user_html
-
-- name: Deploy user-defined HTML files.
+- name: Deploy HTML files of index.
   copy:
     src: ~/html
     dest: /opt/kujirax/proxy/
   become: yes
-  when: user_html.stat.isdir
   notify: Restart NGINX
