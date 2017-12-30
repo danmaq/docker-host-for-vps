@@ -2,23 +2,23 @@ version: '2'
 services:
 
   proxy:
-    image: jwilder/nginx-proxy:alpine
+    image: 'jwilder/nginx-proxy:alpine'
     container_name: kujirax-proxy
     restart: always
     environment:
       ENABLE_IPV6: 'true'
     ports:
-    - 80:80
-    - 443:443
+    - '80:80'
+    - '443:443'
     volumes:
-    - /opt/kujirax/certs:/etc/nginx/certs
-    - /var/run/docker.sock:/tmp/docker.sock:ro
+    - '/opt/kujirax/certs:/etc/nginx/certs'
+    - '/var/run/docker.sock:/tmp/docker.sock:ro'
 
   root:
-    image: nginx:alpine
+    image: 'nginx:alpine'
     container_name: kujirax-root
     restart: always
     environment:
       VIRTUAL_HOST: {{ item.inventory_hostname }}
     volumes:
-    - /opt/kujirax/html:/usr/share/nginx/html:ro
+    - '/opt/kujirax/html:/usr/share/nginx/html:ro'
