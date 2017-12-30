@@ -1,9 +1,17 @@
 ---
-- name: Halt to old container
-  docker_container:
-    name: nginx
-    state: absent
+- name: Searching for old compose.
+  stat:
+    path: /opt/kujirax/docker-compose.yml
+  register: old_compose
+
+- name: Halt to old compose
+  shell: docker-compose down
+  args:
+    chdir: /opt/kujirax
   become: yes
+  when: old_compose.stat.exists
+  register: halt_old_compose
+  changed_when: halt_old_compose.stdout == ""
   ignore_errors: yes
 
 - name: Reboot docker
@@ -12,15 +20,23 @@
     state: restarted
   become: yes
 
-- name: Start NGINX container.
-  docker_container:
-    name: nginx
-    image: 'nginx:alpine'
-    published_ports:
-    - '80:80'
-    - '443:443'
-    volumes:
-    - '/opt/kujirax/proxy/conf:/etc/nginx/conf.d:ro'
-    - '/opt/kujirax/proxy/html:/usr/share/nginx/html:ro'
-    - '/opt/kujirax/proxy/tls:/etc/nginx/tls:ro'
+- name: Remove old container.
+  file:
+    path: /opt/kujirax
+    state: absent
+  become: yes
+
+- name: Migrate to new containers
+  shell: mv /opt/.kujirax /opt/kujirax
+  become: yes
+
+- name: Create a common network
+  docker_network:
+    name: common_link
+  become: yes
+
+- name: Get up to new containers
+  shell: docker-compose up -d
+  args:
+    chdir: /opt/kujirax
   become: yes
