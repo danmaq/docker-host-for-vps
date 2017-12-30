@@ -6,7 +6,6 @@
  * @property {string} image Specified container as the base of the setup container.
  * @property {string} tempImage Temporary container image name for setup.
  * @property {string} name Name of the setup container.
- * @property {string[]} shell
  */
 
 /**

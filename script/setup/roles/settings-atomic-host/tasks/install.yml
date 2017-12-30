@@ -5,8 +5,9 @@
   register: rpm_upgrade
   changed_when: '"No upgrade available." not in rpm_upgrade.stdout'
 
-- debug:
-    msg: Reserved reboot.
+- name: Determine whether OS restart is necessary or not.
+  debug:
+    var: rpm_upgrade.stdout
   changed_when: '"systemctl reboot" in rpm_upgrade.stdout'
   notify: Reboot OS
 
