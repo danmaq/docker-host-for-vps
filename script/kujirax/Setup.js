@@ -1,6 +1,5 @@
 'use strict';
 
-import appRoot from 'app-root-path';
 import Docker from 'dockerode';
 import fs from 'fs';
 import path from 'path';
@@ -11,10 +10,10 @@ import { AnsibleHosts, Dockerfile } from './Template';
 import './type';
 
 const { kujirax, author } =
-require(path.join(appRoot.path, 'package.json'));
+require(path.join(__dirname, '..', 'package.json'));
 
 /** Root directory of temporary container for setup. */
-const setupHome = path.join(appRoot.path, '.setup');
+const setupHome = path.join(__dirname, '..', '.setup');
 
 /**
  * Create an argument to tar.
@@ -37,7 +36,7 @@ const preDeployAsync =
     async(caravan) => {
         const { root } = caravan;
         await tar.c(createTarParams('caravan', root), fs.readdirSync(root));
-        const setupSrc = path.join(appRoot.path, 'script', 'setup');
+        const setupSrc = path.join(__dirname, '..', 'script', 'setup');
         await tar.c(
             createTarParams('script', setupSrc), fs.readdirSync(setupSrc));
         fs.writeFileSync(

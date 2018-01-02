@@ -1,16 +1,15 @@
 'use strict';
 
-import appRoot from 'app-root-path';
 import path from 'path';
 import merge from 'lodash.merge';
 
 import './type';
 
-const { kujirax } = require(path.join(appRoot.path, 'package.json'));
+const { kujirax } = require(path.join(__dirname, '..', 'package.json'));
 
 /** The path where the default JSON file is stored. */
 const defaultSettingsPath =
-    path.join(appRoot.path, 'script', 'setup', kujirax.defaultCaravan);
+    path.join(__dirname, '..', 'script', 'setup', kujirax.defaultCaravan);
 
 /**
  * Extract the configuration file of the user project.
