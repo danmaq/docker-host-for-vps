@@ -2,9 +2,12 @@
 - name: Create source directory if not exists.
   local_action:
     module: file
-    path: /root/certs
+    path: "/root/{{ item }}"
     state: directory
   changed_when: no
+  with_items:
+  - certs
+  - dhparam
 
 - name: Create temporary directory for deploy.
   file:
@@ -20,6 +23,7 @@
   notify: Migrate proxy
   with_items:
   - certs
+  - dhparam
   - html
 
 - name: Deploy Docker Compose settings for proxy.
@@ -30,3 +34,10 @@
   notify: Migrate proxy
   with_items:
   - inventory_hostname: "{{ inventory_hostname }}"
+
+- name: Deploy Dockerfile for proxy.
+  template:
+    src: Dockerfile
+    dest: /opt/.kujirax/Dockerfile
+  become: yes
+  notify: Migrate proxy

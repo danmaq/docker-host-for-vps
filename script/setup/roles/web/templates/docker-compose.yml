@@ -2,7 +2,7 @@ version: '2'
 services:
 
   proxy:
-    image: 'jwilder/nginx-proxy:alpine'
+    build: .
     container_name: kujirax-proxy
     restart: always
     environment:
@@ -12,6 +12,7 @@ services:
     - '443:443'
     volumes:
     - '/opt/kujirax/certs:/etc/nginx/certs'
+    - '/opt/kujirax/dhparam:/etc/nginx/dhparam'
     - '/var/run/docker.sock:/tmp/docker.sock:ro'
 
   root:
@@ -19,6 +20,7 @@ services:
     container_name: kujirax-root
     restart: always
     environment:
+      SSL_POLICY: 'Mozilla-Modern'
       VIRTUAL_HOST: {{ item.inventory_hostname }}
     volumes:
     - '/opt/kujirax/html:/usr/share/nginx/html:ro'
