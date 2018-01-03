@@ -41,3 +41,9 @@
     dest: /opt/.kujirax/Dockerfile
   become: yes
   notify: Migrate proxy
+
+- name: Create a common network
+  docker_network:
+    name: kujirax
+  become: yes
+  notify: Migrate proxy

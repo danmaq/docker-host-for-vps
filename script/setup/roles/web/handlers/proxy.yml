@@ -30,11 +30,6 @@
   shell: mv /opt/.kujirax /opt/kujirax
   become: yes
 
-- name: Create a common network
-  docker_network:
-    name: common_link
-  become: yes
-
 - name: Build new containers
   shell: docker-compose build
   args:
