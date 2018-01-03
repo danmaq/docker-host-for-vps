@@ -5,6 +5,7 @@ services:
     build: .
     container_name: kujirax-proxy
     restart: always
+    privileged: yes
     environment:
       ENABLE_IPV6: 'true'
     ports:
@@ -24,3 +25,8 @@ services:
       VIRTUAL_HOST: {{ item.inventory_hostname }}
     volumes:
     - '/opt/kujirax/html:/usr/share/nginx/html:ro'
+
+networks:
+  default:
+    external:
+      name: kujirax
