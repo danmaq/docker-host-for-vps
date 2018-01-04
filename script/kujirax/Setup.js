@@ -2,8 +2,10 @@
 
 import Docker from 'dockerode';
 import fs from 'fs';
+import net from 'net';
 import path from 'path';
 import tar from 'tar';
+import temp from 'temp';
 
 import { AnsibleHosts, Dockerfile } from './Template';
 
@@ -12,56 +14,57 @@ import './type';
 const { kujirax, author } =
 require(path.join(__dirname, '..', 'package.json'));
 
-/** Root directory of temporary container for setup. */
-const setupHome = path.join(__dirname, '..', '.setup');
-
 /**
  * Create an argument to tar.
+ * @param {string} setup Path of setup.
  * @param {string} fileName Filename.
  * @param {string} cwd Current path.
  * @return {{cwd: string, file: string, gzip: boolean}} Argument for tar.
  */
 const createTarParams =
-    (fileName, cwd) => ({
-        file: path.join(setupHome, `${fileName}.tar.gz`),
+    (setup, fileName, cwd) => ({
+        file: path.join(setup, `${fileName}.tar.gz`),
         gzip: true,
         cwd,
     });
 
 /**
  * Deploy that temporary container for setup.
+ * @param {string} setup Path of setup.
  * @param {Caravan} caravan Settings of the user project.
  */
 const preDeployAsync =
-    async(caravan) => {
+    async(setup, caravan) => {
         const { root } = caravan;
-        await tar.c(createTarParams('caravan', root), fs.readdirSync(root));
+        await tar.c(createTarParams(setup, 'caravan', root), fs.readdirSync(root));
         const setupSrc = path.join(__dirname, '..', 'script', 'setup');
         await tar.c(
-            createTarParams('script', setupSrc), fs.readdirSync(setupSrc));
+            createTarParams(setup, 'script', setupSrc), fs.readdirSync(setupSrc));
         fs.writeFileSync(
-            path.join(setupHome, kujirax.defaultCaravan),
+            path.join(setup, kujirax.defaultCaravan),
             JSON.stringify(caravan, null, 4));
     };
 
 /**
  * Create a Dockerfile for the temporary container for deployment.
+ * @param {string} setup Path of setup.
  * @param {string} image Docker image.
  */
 const createDockerfileAsync =
-    async(image) =>
+    async(setup, image) =>
     fs.writeFileSync(
-        path.join(setupHome, 'Dockerfile'), Dockerfile(image));
+        path.join(setup, 'Dockerfile'), Dockerfile(image));
 
 /**
  *
+ * @param {string} setup Path of setup.
  * @param {string} host
  * @param {Caravan.SSH} ssh
  */
 const createAnsibleHostsFileAsync =
-    async(host, ssh) =>
+    async(setup, host, ssh) =>
     fs.writeFileSync(
-        path.join(setupHome, 'hosts'), AnsibleHosts(host, ssh));
+        path.join(setup, 'hosts'), AnsibleHosts(host, ssh));
 
 /**
  * Create docker instance.
@@ -74,24 +77,39 @@ const createDocker =
         ({ socketPath: '//./pipe/docker_engine' }) : undefined);
 
 /**
+ * Wait until Docker processing is completed.
+ * @param {Promise<net.Socket>} promiseStream Result of docker function.
+ */
+const waitDocker =
+    promiseStream =>
+    new Promise(
+        async(resolve) => {
+            const stream = await promiseStream;
+            stream.pipe(process.stdout);
+            stream.once('end', resolve);;
+        });
+
+/**
  * Create a Docker image for the temporary container for deployment.
+ * @param {string} setup Path of setup.
  * @param {string} src Docker image.
  * @param {string} dst Docker image.
  */
 const createImageAsync =
-    async(src, dst) => {
+    async(setup, src, dst) => {
         const docker = createDocker();
-        // FIXME: not wait?
-        await docker.pull(src);
+        await waitDocker(docker.pull(src));
         try {
             await docker.getImage(dst).remove();
             console.log('Container exists. Replacing...');
         } catch (e) {
             console.log('Container did not found. Creating...');
         }
-        const ctx = { context: setupHome, src: fs.readdirSync(setupHome) };
-        // FIXME: not wait?
-        await docker.buildImage(ctx, { t: dst });
+        const ctx = {
+            context: setup,
+            src: fs.readdirSync(setup)
+        };
+        await waitDocker(docker.buildImage(ctx, { t: dst }));
     };
 
 /**
@@ -116,15 +134,14 @@ const setupAsync =
     async(caravan) => {
         const { host, ssh, setup: { image, tempImage, name } } =
         caravan;
+        const setup = temp.mkdirSync('.kujirax');
         console.info('Correct items...');
-        await preDeployAsync(caravan);
-        await createDockerfileAsync(image);
-        await createAnsibleHostsFileAsync(host, ssh);
+        await preDeployAsync(setup, caravan);
+        await createDockerfileAsync(setup, image);
+        await createAnsibleHostsFileAsync(setup, host, ssh);
         console.info('Create temporary image...');
-        await createImageAsync(image, tempImage);
-        // XXX: Wait until the Docker image becomes available here.
-        // However, It is more correct to wait until the Docker image is retrieved.
-        await new Promise(r => setTimeout(r, 3000));
+        await createImageAsync(setup, image, tempImage);
+        temp.cleanupSync();
         console.info('Run setup image...');
         await runImageAsync(tempImage, name);
     }
