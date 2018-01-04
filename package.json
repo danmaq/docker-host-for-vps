@@ -1,7 +1,7 @@
 {
     "name": "kujirax",
     "description": "Script for easily installing jwilder/nginx-proxy in your VPS.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "license": "MIT",
     "author": {
         "name": "Shuhei Nomura (danmaq)",
@@ -18,11 +18,11 @@
     },
     "preferGlobal": true,
     "bin": {
-        "kujirax": "dist/kujirax.js"
+        "kujirax": "index.js"
     },
     "scripts": {
         "start": "gulp",
-        "kujirax": "dist/index.js",
+        "kujirax": "node index.js",
         "prepublish": "gulp babel"
     },
     "engines": {
