@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  proxy:
+    build: .
+    container_name: kujirax-proxy
+    restart: always
+    privileged: yes
+    environment:
+      ENABLE_IPV6: 'true'
+    ports:
+    - '80:80'
+    - '443:443'
+    volumes:
+    - '/opt/kujirax/certs:/etc/nginx/certs'
+    - '/opt/kujirax/dhparam:/etc/nginx/dhparam'
+    - '/var/run/docker.sock:/tmp/docker.sock:ro'
+
+  root:
+    image: 'nginx:alpine'
+    container_name: kujirax-root
+    restart: always
+    environment:
+      SSL_POLICY: 'Mozilla-Modern'
+      VIRTUAL_HOST: {{ item.inventory_hostname }}
+    volumes:
+    - '/opt/kujirax/html:/usr/share/nginx/html:ro'
+
+networks:
+  default:
+    external:
+      name: kujirax
