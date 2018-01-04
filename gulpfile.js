@@ -10,17 +10,13 @@ gulp.task('babel', () => {
         .pipe(plumber())
         .pipe(babel({
             'presets': [
-                'stage-1',
-                'stage-2',
                 'stage-3', ['env', { 'targets': { 'node': '6.12.2' } }]
             ],
             'plugins': ['transform-runtime']
         }))
-        .pipe(gulp.dest('./dist'))
+        .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('watch', () => {
-    gulp.watch('./script/kujirax/**/*.js', ['babel'])
-});
+gulp.task('watch', () => gulp.watch('./script/kujirax/**/*.js', ['babel']));
 
 gulp.task('default', ['babel', 'watch']);
