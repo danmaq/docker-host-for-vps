@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/kujirax.svg)](https://badge.fury.io/js/kujirax)
+
 # KUJIRAX
 
 It's a multi-webapp setup system for a VPS.  
