@@ -28,7 +28,7 @@
 
 - name: Deploy Docker Compose settings for proxy.
   template:
-    src: docker-compose.yml
+    src: kujirax.docker-compose.yml
     dest: /opt/.kujirax/docker-compose.yml
   become: yes
   notify: Migrate proxy
@@ -37,7 +37,7 @@
 
 - name: Deploy Dockerfile for proxy.
   template:
-    src: Dockerfile
+    src: kujirax.Dockerfile
     dest: /opt/.kujirax/Dockerfile
   become: yes
   notify: Migrate proxy
