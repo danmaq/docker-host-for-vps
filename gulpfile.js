@@ -10,7 +10,7 @@ gulp.task('babel', () => {
         .pipe(plumber())
         .pipe(babel({
             'presets': [
-                'stage-3', ['env', { 'targets': { 'node': '6.12.2' } }]
+                ['env', { 'targets': { 'node': '6.12.2' } }]
             ],
             'plugins': ['transform-runtime']
         }))
