@@ -63,3 +63,7 @@ $ npm i -g kujirax
 ```SH
 $ kujirax
 ```
+
+## Common network for _jwilder/nginx-proxy_
+
+`kujirax`
