@@ -14,10 +14,11 @@
   changed_when: halt_old_compose.stdout == ""
   ignore_errors: yes
 
-- name: Update images
-  docker_image:
-    name: "{{ item }}"
+- name: Update Docker images.
+  shell: "docker pull {{ item }}"
   become: yes
+  register: docker_pull
+  changed_when: '"Pull complete" in docker_pull.stdout'
   with_items:
   - 'jwilder/nginx-proxy:alpine'
   - 'nginx:alpine'
